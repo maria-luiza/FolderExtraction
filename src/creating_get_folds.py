@@ -8,8 +8,24 @@ from folder_utils import *
 ROOT_DIR = get_root_dirname()
 
 
+def generate_cross_datasets(final_string, indexes, input, label, final_path, fold_number, type):
+    x_out = []
+    y_out = []
+    for index in indexes:
+        x_out.append(input[index])
+        y_out.append(label[index])
+        final_string = final_string + ",".join(map(str, input[index])) + "," + label[index] + "\n"
+
+    # save the training datasets
+    with open(final_path + "/csv/" + file + "_Fold_" + str(fold_number) + "_" + type + ".csv", 'w') as ft:
+        ft.write(final_string)
+        ft.close()
+
+    return x_out, y_out
+
+
 def get_random_labels(actual_label, size, uniqueList):
-    new_label = str(random.choice(uniqueActivitiesList))
+    new_label = str(random.choice(uniqueList))
 
     if actual_label == new_label:
         get_random_labels(actual_label, size, uniqueList)
@@ -43,8 +59,6 @@ def create_or_get_existing_folds(input, file):
     input_dir = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
     path_input = os.path.dirname(join_paths(input_dir, input + "/"))
 
-    print("create_function")
-
     if (os.path.exists(path_fold + "/" + file)):
         with open(path_fold + "/" + file, 'rb') as f:
             folds = pickle.load(f)
@@ -56,37 +70,37 @@ def create_or_get_existing_folds(input, file):
             y = pickle.load(f)  # Get the activities for each activation
             uniqueActivitiesList = pickle.load(f)  # Get unique activities
 
-            # if (x != [] and y != []):
-            #     kFold = StratifiedKFold(n_splits=5, shuffle=True, random_state=21)
-            #
-            #     for foldNumber, (trainIndexes, testIndexes) in enumerate(kFold.split(x, y)):
-            #         xTrain, xTest, yTest, yTrain0 = [], [], [], []
-            #         trainingString, testString = "", ""
-            #
-            #         for index in trainIndexes:
-            #             xTrain.append(x[index])
-            #             yTrain0.append(y[index])
-            #             trainingString = trainingString + ",".join(map(str, x[index])) + "," + y[index] + "\n"
-            #         with open(path_input + "/" + file + "_Fold_" + str(foldNumber) + "_Training.csv", 'w') as ft:
-            #             ft.write(trainingString)
-            #             ft.close()
-            #
-            #         for index in testIndexes:
-            #             xTest.append(x[index])
-            #             yTest.append(y[index])
-            #             testString = testString + ",".join(map(str, x[index])) + "," + y[index] + "\n"
-            #         with open(path_input + "/" + file + "_Fold_" + str(foldNumber) + "_Testing.csv", 'w') as ft2:
-            #             ft2.write(testString)
-            #             ft2.close()
-            #
-            #         yTrains = generate_random_labels(yTrain0, uniqueActivitiesList)
-            #
-            #         fold = fold_msb3_tcc(xTrain, yTrains, xTest, yTest)
-            #         folds.append(fold)
-            #     with open(path_fold + "/" + file, 'wb') as fp:
-            #         pickle.dump(folds, fp)
-            #         pickle.dump(uniqueActivitiesList,fp)
-            #         fp.close()
+            if (x != [] and y != []):
+                kFold = StratifiedKFold(n_splits=5, shuffle=True, random_state=21)
+
+                for foldNumber, (trainIndexes, testIndexes) in enumerate(kFold.split(x, y)):
+                    trainingString, testString = "", ""
+
+                    # save the training datasets
+                    xTrain, yTrain = generate_cross_datasets(trainingString,
+                                                             trainIndexes,
+                                                             x, y,
+                                                             path_input,
+                                                             foldNumber,
+                                                             "Training")
+                    # save the validation datasets
+                    xTest, yTest = generate_cross_datasets(testString,
+                                                           testIndexes,
+                                                           x, y,
+                                                           path_input,
+                                                           foldNumber,
+                                                           "Testing")
+
+                    yTrains = generate_random_labels(yTrain, uniqueActivitiesList)
+
+                    fold = fold_msb3_tcc(xTrain, yTrains, xTest, yTest)
+                    folds.append(fold)
+
+                with open(path_fold + "/" + file, 'wb') as fp:
+                    pickle.dump(folds, fp)
+                    pickle.dump(uniqueActivitiesList,fp)
+                    fp.close()
+
             f.close()
     return [folds, uniqueActivitiesList]
 
