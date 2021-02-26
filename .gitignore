@@ -2,3 +2,5 @@
 .idea/
 folds/
 venv/
+input_data/Dynamic/csv
+input_data/Static/csv
