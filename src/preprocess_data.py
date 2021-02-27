@@ -25,11 +25,15 @@ class DataProcessing:
             total_windows = len(rows) - self.window + 1
             for i in range(0, total_windows):
                 window_rows = rows[i:self.window + i]
-                features = generate_feature_vector(window_rows, activities_not_finished, self.bag_of_sensors)
 
-                if features[1] != "Other":
-                    feature_vector.append(features[0])
-                    label_array.append(features[1])
+                if window_rows:
+                    features = generate_feature_vector(window_rows, activities_not_finished, self.bag_of_sensors)
+
+                    if features[1] != "Other":
+                        feature_vector.append(features[0])
+                        label_array.append(features[1])
+                else:
+                    feature_vector = []
 
         # Dynamic Windows size
         else:
@@ -38,13 +42,17 @@ class DataProcessing:
 
             for window in windows_size:
                 window_rows = raw_filtered[i:window + i]
-                features = generate_feature_vector(window_rows, activities_not_finished, bag_of_sensors)
 
-                if features[1] != "Other":
-                    feature_vector.append(features[0])
-                    label_array.append(features[1])
+                if window_rows:
+                    features = generate_feature_vector(window_rows, activities_not_finished, bag_of_sensors)
 
-                i = window + 1
+                    if features[1] != "Other":
+                        feature_vector.append(features[0])
+                        label_array.append(features[1])
+
+                    i = window + 1
+                else:
+                    feature_vector = []
 
         feature_vector_array = normalize_data(feature_vector)
         unique_activities_list = np.unique(np.array(label_array))
@@ -60,32 +68,38 @@ if __name__ == '__main__':
     dataFiles = list_directory(FILES_DIR)
 
     # Window size
-    windowSize = 0
+    windowSize = [0, 30]
 
-    # Filename to save
-    filename = "__window_" + str(windowSize)
+    for window in windowSize:
+        print("Window size: ", window)
+        # Filename to save
+        filename = "__window_" + str(window)
+        for file in dataFiles:
+            if not file.startswith('.'):
+                print("File to be processed: ", file)
+                try:
+                    file_rows = open_dataset_files(join_paths(FILES_DIR, file + "/ann.txt"))
+                    dataProcessed = DataProcessing(file_rows, window)
+                    data_array = dataProcessed.process_data()
 
-    for file in dataFiles:
-        if not file.startswith('.'):
-            print("File to be processed: ", file)
-            try:
-                file_rows = open_dataset_files(join_paths(FILES_DIR, file + "/ann.txt"))
-                dataProcessed = DataProcessing(file_rows, windowSize)
-                data_array = dataProcessed.process_data()
+                    inputData, labelData, uniqueActivitiesList = data_array
 
-                inputData, labelData, uniqueActivitiesList = data_array
+                    dir_name = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
+                    if not os.path.exists(dir_name):
+                        os.makedirs(dir_name)
 
-                dir_name = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
-                if not os.path.exists(dir_name):
-                    os.makedirs(dir_name)
+                    if window == 0:
+                        path = join_paths(dir_name, "Dynamic") + "/" + file +  filename
+                    else:
+                        path = join_paths(dir_name, "Static") + "/" + file + filename
 
-                with open(join_paths(dir_name, file) + filename, 'wb') as fp:
-                    pickle.dump(inputData, fp)
-                    pickle.dump(labelData, fp)
-                    pickle.dump(uniqueActivitiesList, fp)
-                    fp.close()
+                    with open(path, 'wb') as fp:
+                        pickle.dump(inputData, fp)
+                        pickle.dump(labelData, fp)
+                        pickle.dump(uniqueActivitiesList, fp)
+                        fp.close()
 
-            except:
-                print('Exception : ' + file)
-                traceback.print_exc()
-                pass
+                except:
+                    print('Exception : ' + file)
+                    traceback.print_exc()
+                    pass

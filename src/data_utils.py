@@ -13,9 +13,10 @@ def get_milliseconds_from_date(date, time):
 def get_empty_bag_of_sensors(file_rows):
     sensors = {}
     for row in file_rows:
-        sensor = row[2]
-        if sensor not in sensors:
-            sensors.update({sensor: 0})
+        if row:
+            sensor = row[2]
+            if sensor not in sensors:
+                sensors.update({sensor: 0})
     return sensors
 
 
@@ -138,22 +139,4 @@ def generate_feature_vector(windows, activities_not_finished, empty_bag):
 
 
 def normalize_data(feature_vector):
-    max_per_col = []
-    min_per_col = []
-    range_per_col = []
-
-    for column in range(0, len(feature_vector[0])):
-        max_val = max(row[column] for row in feature_vector)
-        min_value = min(row[column] for row in feature_vector)
-        max_per_col.append(max_val)
-        min_per_col.append(min_value)
-        range_per_col.append(max_val-min_value)
-
-    for r in range(0, len(feature_vector)):
-        for c in range(0, len(feature_vector[0])):
-            if range_per_col[c] > 0:
-                feature_vector[r][c] = (feature_vector[r][c] - min_per_col[c])/range_per_col[c]
-            else:
-                feature_vector[r][c] = 0
-
-    return feature_vector
+    return [[(x-min(l))/(max(l)-min(l)) for x in l] for l in feature_vector]
