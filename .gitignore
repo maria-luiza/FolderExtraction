@@ -1,6 +1,4 @@
 .DS_Store
 .idea/
-folds/
 venv/
-input_data/Dynamic/csv
-input_data/Static/csv
+input_data/*
