@@ -1,4 +1,6 @@
 .DS_Store
 .idea/
 venv/
+folds/
 input_data/*
+src/__pycache__/

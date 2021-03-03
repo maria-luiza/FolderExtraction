@@ -41,7 +41,7 @@ def generate_random_labels(yTrain0, uniqueActivitiesList):
 
     for times in range(0, 5):
         yTrainCopy = yTrainCopy.copy()
-        for change in range(0,numChanges):
+        for change in range(0, numChanges):
             index = random.randint(0, size - 1)
             actual_label = yTrainCopy[index]
             yTrainCopy[index] = get_random_labels(actual_label, size, uniqueActivitiesList)
@@ -64,7 +64,7 @@ def create_or_get_existing_folds(input, file):
             folds = pickle.load(f)
             uniqueActivitiesList = pickle.load(f)
             f.close()
-    else: #Create
+    else:  # Create
         with open(path_input + "/" + file, 'rb') as f:
             x = pickle.load(f)  # Get the vector sensor activation
             y = pickle.load(f)  # Get the activities for each activation
@@ -98,7 +98,7 @@ def create_or_get_existing_folds(input, file):
 
                 with open(path_fold + "/" + file, 'wb') as fp:
                     pickle.dump(folds, fp)
-                    pickle.dump(uniqueActivitiesList,fp)
+                    pickle.dump(uniqueActivitiesList, fp)
                     fp.close()
 
             f.close()
@@ -106,7 +106,7 @@ def create_or_get_existing_folds(input, file):
 
 
 if __name__ == '__main__':
-    inputs = ["Dynamic", "Static"]
+    inputs = ["Static", "Dynamic"]
 
     dir_name = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
 
@@ -114,8 +114,7 @@ if __name__ == '__main__':
         path = os.path.dirname(join_paths(dir_name, input + "/"))
         files = list_directory(path)
         for file in files:
-            print(file)
-            if file != ".DS_Store":
+            if file not in [".DS_Store", "csv"]:
                 try:
                     print("~~~~~~~~~~~ Database : " + file + " ~~~~~~~~~~~\n")
                     folds, uniqueActivitiesList = create_or_get_existing_folds(input, file)
