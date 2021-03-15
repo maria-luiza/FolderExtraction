@@ -29,7 +29,7 @@ def plot_activities(df, title):
     plt.xlabel("Activities")
     plt.ylabel("#Windows")
     plt.xticks(rotation=15)
-    plt.show()
+    plt.savefig("activities__" + dataset_name + title[1] + ".jpeg", quality=95, format="jpeg")
 
 
 def total_activities_transitions(activities):
@@ -75,12 +75,12 @@ def sensor_profile(input, labels):
     total_sensors = len(input[0]) - 3
 
     for row, label in zip(input, labels):
-        dict_activities[label].extend(row[3:])
+        dict_activities[label].append(row[3:])
 
     for activity in set(labels):
-        dict_activities[activity] = np.average(dict_activities[activity])
+        dict_activities[activity] = np.mean(dict_activities[activity], axis=0)
 
-    return dict_activities
+    return total_sensors, dict_activities
 
 
 if __name__ == '__main__':
@@ -104,11 +104,10 @@ if __name__ == '__main__':
                             unique_activities = pickle.load(fp)
                             fp.close()
 
-                        print(sensor_profile(windows, labels))
+                        # len_windows = total_windows(windows)
+                        # total_sensors, sensor_activation = sensor_profile(windows, labels)
                         # heatmap(total_activities_transitions(labels), dataset)
-                        # plot_activities(total_activities(labels), dataset)
-
-
+                        plot_activities(total_activities(labels), dataset)
             except:
                 print('Exception : ' + file)
                 traceback.print_exc()
