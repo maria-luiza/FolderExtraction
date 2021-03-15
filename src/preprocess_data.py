@@ -89,7 +89,7 @@ if __name__ == '__main__':
                         os.makedirs(dir_name)
 
                     if window == 0:
-                        path = join_paths(dir_name, "Dynamic") + "/" + file +  filename
+                        path = join_paths(dir_name, "Dynamic") + "/" + file + filename
                     else:
                         path = join_paths(dir_name, "Static") + "/" + file + filename
 
