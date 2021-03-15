@@ -8,6 +8,10 @@ from collections import Counter, OrderedDict
 from folder_utils import *
 
 
+#output graphs
+output = get_root_dirname() + "/graphs/"
+
+
 def total_windows(windows):
     return len(windows)
 
@@ -28,8 +32,10 @@ def plot_activities(df, title):
     plt.title("Dataset: {0}".format(dataset_name))
     plt.xlabel("Activities")
     plt.ylabel("#Windows")
-    plt.xticks(rotation=15)
-    plt.savefig("activities__" + dataset_name + title[1] + ".jpeg", quality=95, format="jpeg")
+    plt.savefig(output + title[1] + "/activities__" + dataset_name + ".png",
+                bbox_inches='tight',
+                orientation='landscape',
+                dpi=300)
 
 
 def total_activities_transitions(activities):
@@ -67,7 +73,10 @@ def heatmap(activities_transitions, title):
     ax.set_title("Dataset: {0}".format(dataset_name))
     plt.xlabel('Next', fontsize=10, fontweight='bold')  # x-axis label with fontsize 15
     plt.ylabel('Actual', fontsize=10, fontweight='bold')  # y-axis label with fontsize 15
-    plt.show()
+    plt.savefig(output + title[1] + "/heatmap__" + dataset_name + ".png",
+                bbox_inches='tight',
+                orientation='landscape',
+                dpi=300)
 
 
 def sensor_profile(input, labels):
@@ -97,6 +106,10 @@ if __name__ == '__main__':
                 datasets = list_directory(join_paths(FILES_DIR, file))
                 for dataset in datasets:
                     if dataset not in [".DS_Store", "csv"]:
+
+                        dataset_name = dataset.split("__")[0].upper()
+                        window = dataset.split("__")[1]
+
                         path = join_paths(FILES_DIR, file) + "/" + dataset
                         with open(path, 'rb') as fp:
                             windows = pickle.load(fp)
@@ -104,10 +117,17 @@ if __name__ == '__main__':
                             unique_activities = pickle.load(fp)
                             fp.close()
 
-                        # len_windows = total_windows(windows)
-                        # total_sensors, sensor_activation = sensor_profile(windows, labels)
-                        # heatmap(total_activities_transitions(labels), dataset)
+                        len_windows = total_windows(windows)
+                        total_sensors, sensor_activation = sensor_profile(windows, labels)
+                        heatmap(total_activities_transitions(labels), dataset)
                         plot_activities(total_activities(labels), dataset)
+
+                        with open(output + window + "/" + dataset_name + ".txt", "w") as f:
+                            f.write("Total Windows:{0}\n".format(len_windows))
+                            f.write("Total Sensors:{0}\n\n".format(total_sensors))
+                            f.write("Sensor Activation:{0}\n\n".format(sensor_activation))
+                            f.close()
+
             except:
                 print('Exception : ' + file)
                 traceback.print_exc()

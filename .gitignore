@@ -2,5 +2,6 @@
 .idea/
 venv/
 folds/
+graphs/
 input_data/*
 src/__pycache__/
