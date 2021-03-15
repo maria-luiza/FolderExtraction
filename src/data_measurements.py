@@ -36,6 +36,7 @@ def plot_activities(df, title):
                 bbox_inches='tight',
                 orientation='landscape',
                 dpi=300)
+    plt.clf()
 
 
 def total_activities_transitions(activities):
@@ -50,8 +51,6 @@ def total_activities_transitions(activities):
 
 
 def heatmap(activities_transitions, title):
-    ax = plt.axes()
-
     title = title.split("__")
     dataset_name = title[0].upper()
     # Calculate correlation between each pair of variable
@@ -62,21 +61,23 @@ def heatmap(activities_transitions, title):
     mask[np.triu_indices_from(mask)] = True
     # plot a heatmap with annotation
     # Draw the heatmap with the mask
-    sns.heatmap(activities_transitions,
-                ax=ax,
+    heat = sns.heatmap(activities_transitions,
                 mask=mask,
                 square=True,
                 annot=True,
                 annot_kws={"size": 7},
+                linecolor='white',
+                linewidths=1,
                 cmap="Blues",
                 cbar_kws={'label': 'Transitions'})
-    ax.set_title("Dataset: {0}".format(dataset_name))
+    plt.title("Dataset: {0}".format(dataset_name))
     plt.xlabel('Next', fontsize=10, fontweight='bold')  # x-axis label with fontsize 15
     plt.ylabel('Actual', fontsize=10, fontweight='bold')  # y-axis label with fontsize 15
-    plt.savefig(output + title[1] + "/heatmap__" + dataset_name + ".png",
+    heat.figure.savefig(output + title[1] + "/heatmap__" + dataset_name + ".png",
                 bbox_inches='tight',
                 orientation='landscape',
-                dpi=300)
+                dpi=400)
+    plt.clf()
 
 
 def sensor_profile(input, labels):
@@ -127,7 +128,6 @@ if __name__ == '__main__':
                             f.write("Total Sensors:{0}\n\n".format(total_sensors))
                             f.write("Sensor Activation:{0}\n\n".format(sensor_activation))
                             f.close()
-
             except:
                 print('Exception : ' + file)
                 traceback.print_exc()
