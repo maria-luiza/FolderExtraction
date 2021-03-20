@@ -16,11 +16,6 @@ def generate_cross_datasets(final_string, indexes, input, label, final_path, fol
         y_out.append(label[index])
         final_string = final_string + ",".join(map(str, input[index])) + "," + label[index] + "\n"
 
-    # save the training datasets
-    with open(final_path + "/csv/" + file + "_Fold_" + str(fold_number) + "_" + type + ".csv", 'w') as ft:
-        ft.write(final_string)
-        ft.close()
-
     return x_out, y_out
 
 
@@ -106,7 +101,7 @@ def create_or_get_existing_folds(input, file):
 
 
 if __name__ == '__main__':
-    inputs = ["Static", "Dynamic"]
+    inputs = ["Dynamic"]
 
     dir_name = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
 

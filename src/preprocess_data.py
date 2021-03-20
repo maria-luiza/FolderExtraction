@@ -39,9 +39,11 @@ class DataProcessing:
         else:
             raw_filtered, windows_size = get_dynamic_window(rows)
             bag_of_sensors = get_empty_bag_of_sensors(raw_filtered)
+            previous_window = 0
 
-            for window in windows_size:
-                window_rows = raw_filtered[i:window + i]
+            for i, window in zip(range(0, len(windows_size)), windows_size):
+                window_rows = raw_filtered[previous_window:window + previous_window]
+                previous_window += window
 
                 if window_rows:
                     features = generate_feature_vector(window_rows, activities_not_finished, bag_of_sensors)
@@ -49,8 +51,6 @@ class DataProcessing:
                     if features[1] != "Other":
                         feature_vector.append(features[0])
                         label_array.append(features[1])
-
-                    i = window + 1
                 else:
                     feature_vector = []
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     dataFiles = list_directory(FILES_DIR)
 
     # Window size
-    windowSize = [0, 30]
+    windowSize = [0]
 
     for window in windowSize:
         print("Window size: ", window)
