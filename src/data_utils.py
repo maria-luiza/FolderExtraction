@@ -108,22 +108,29 @@ def generate_feature_vector(windows, activities_not_finished, empty_bag):
 
     # Get the first activation captured in that window
     first_row = windows[0]
-    first_sensor_time = get_milliseconds_from_date(first_row[0], first_row[1])
+    if first_row:
+        first_sensor_time = get_milliseconds_from_date(first_row[0], first_row[1])
+    else:
+        first_sensor_time = 0
     # Get the last activation captured in that window
     last_row = windows[len(windows)-1]
-    last_sensor_time = get_milliseconds_from_date(last_row[0], last_row[1])
+    if last_row:
+        last_sensor_time = get_milliseconds_from_date(last_row[0], last_row[1])
+    else:
+        last_sensor_time = 0
     # Get the duration of the window
     window_temporal_span = (last_sensor_time - first_sensor_time)
 
     bag_of_sensors = empty_bag.copy()
 
     for window in windows:
-        sensor = window[2]
-        bag_of_sensors[sensor] = bag_of_sensors[sensor] + 1
-        activity_label, was_activity_end = get_activity_label(window,
-                                                              activity_label,
-                                                              was_activity_end,
-                                                              activities_not_finished)
+        if window:
+            sensor = window[2]
+            bag_of_sensors[sensor] = bag_of_sensors[sensor] + 1
+            activity_label, was_activity_end = get_activity_label(window,
+                                                                  activity_label,
+                                                                  was_activity_end,
+                                                                  activities_not_finished)
 
     # What was the label computed for the last activity in the window?
     if not activity_label:
