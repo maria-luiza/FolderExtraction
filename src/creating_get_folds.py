@@ -101,7 +101,7 @@ def create_or_get_existing_folds(input, file):
 
 
 if __name__ == '__main__':
-    inputs = ["Dynamic"]
+    inputs = ["Static", "Dynamic"]
 
     dir_name = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
 
