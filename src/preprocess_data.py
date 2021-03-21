@@ -68,7 +68,7 @@ if __name__ == '__main__':
     dataFiles = list_directory(FILES_DIR)
 
     # Window size
-    windowSize = [0]
+    windowSize = [0, 30]
 
     for window in windowSize:
         print("Window size: ", window)
