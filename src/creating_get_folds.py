@@ -8,7 +8,7 @@ from folder_utils import *
 ROOT_DIR = get_root_dirname()
 
 
-def generate_cross_datasets(final_string, indexes, input, label, final_path, fold_number, type):
+def generate_cross_datasets(final_string, indexes, input, label):
     x_out = []
     y_out = []
     for index in indexes:
@@ -72,19 +72,9 @@ def create_or_get_existing_folds(input, file):
                     trainingString, testString = "", ""
 
                     # save the training datasets
-                    xTrain, yTrain = generate_cross_datasets(trainingString,
-                                                             trainIndexes,
-                                                             x, y,
-                                                             path_input,
-                                                             foldNumber,
-                                                             "Training")
+                    xTrain, yTrain = generate_cross_datasets(trainingString, trainIndexes, x, y)
                     # save the validation datasets
-                    xTest, yTest = generate_cross_datasets(testString,
-                                                           testIndexes,
-                                                           x, y,
-                                                           path_input,
-                                                           foldNumber,
-                                                           "Testing")
+                    xTest, yTest = generate_cross_datasets(testString, testIndexes, x, y)
 
                     yTrains = generate_random_labels(yTrain, uniqueActivitiesList)
 
@@ -101,7 +91,7 @@ def create_or_get_existing_folds(input, file):
 
 
 if __name__ == '__main__':
-    inputs = ["Static", "Dynamic"]
+    inputs = ["Dynamic", "Static"]
 
     dir_name = os.path.dirname(join_paths(ROOT_DIR, "input_data/"))
 

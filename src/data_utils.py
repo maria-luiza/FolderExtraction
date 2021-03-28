@@ -146,4 +146,20 @@ def generate_feature_vector(windows, activities_not_finished, empty_bag):
 
 
 def normalize_data(feature_vector):
-    return [[(x-min(l))/(max(l)-min(l)) for x in l] for l in feature_vector]
+    min_column, range_column = [], []
+
+    for column in range(0, len(feature_vector[0])):
+        max_val = max(row[column] for row in feature_vector)
+        min_val = min(row[column] for row in feature_vector)
+        min_column.append(min_val)
+
+        range_column.append(max_val-min_val)
+
+    for r in range(0, len(feature_vector)):
+        for c in range(0, len(feature_vector[0])):
+            if range_column[c] != 0:
+                feature_vector[r][c] = (feature_vector[r][c] - min_column[c])/range_column[c]
+            else:
+                feature_vector[r][c] = 0
+
+    return feature_vector
